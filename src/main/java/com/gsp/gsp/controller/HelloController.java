@@ -1,4 +1,4 @@
-package com.gsp.gsp.controllers;
+package com.gsp.gsp.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
