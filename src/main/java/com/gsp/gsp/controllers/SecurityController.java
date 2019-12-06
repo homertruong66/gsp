@@ -1,96 +1,63 @@
 package com.gsp.gsp.controllers;
 
 import com.gsp.gsp.models.User;
+import io.jsonwebtoken.Claims;
 import org.springframework.web.bind.annotation.*;
-
+import com.gsp.gsp.util.DBUtil;
 import java.sql.*;
-
+import com.gsp.gsp.token.JWTToken;
 @RestController
 @RequestMapping("/")
 public class SecurityController {
-    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost/gspdb";
-
-    //  Database credentials
-    static final String USER = "root";
-    static final String PASS = "1234";
-
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        int x = (int) Math.sqrt(9);
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            //STEP 2: Register JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
+    public Claims login(@RequestParam String username, @RequestParam String password) throws SQLException, ClassNotFoundException {
+        Connection connection = DBUtil.connection();
+        Statement statement = connection.createStatement();
+        String sql = "SELECT id, firstname, lastname, email, pass, role FROM users WHERE email = '" + username + "' AND pass = '" + password + "'";
+        ResultSet rs = statement.executeQuery(sql);
+        //STEP 5: Extract data from result set
+        User user = new User();
+        while (rs.next()) {
+            //Retrieve by column name
+            int id = rs.getInt("id");
+            user.setId(id);
+            String firstName = rs.getString("firstname");
+            user.setFirstName(firstName);
+            String lastName = rs.getString("lastname");
+            user.setLastName(lastName);
+            String email = rs.getString("email");
+            user.setEmail(email);
+            String pass = rs.getString("pass");
+            user.setPass(pass);
+            byte role = rs.getByte("role");
+            user.setRole(role);
 
-            //STEP 3: Open a connection
-            System.out.println("Connecting to a selected database...");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            System.out.println("Connected database successfully...");
+            //Token
 
-            //STEP 4: Execute a query
-            System.out.println("Creating statement...");
-            stmt = conn.createStatement();
+            //Display values
+            System.out.print("ID: " + id);
+            System.out.print(", First name: " + firstName);
+            System.out.print(", Last name: " + lastName);
+            System.out.print(", Email: " + email);
+            System.out.print(", Pass: " + pass);
+            System.out.print(", Role: " + role);
+            System.out.println();
+        }
 
-            String sql = "SELECT id, firstname, lastname, email, pass, role FROM users WHERE email = '"+ username +"' AND pass = '"+ password+"'";
-            ResultSet rs = stmt.executeQuery(sql);
-            //STEP 5: Extract data from result set
-            User user = new User();
-            while (rs.next()) {
-                //Retrieve by column name
-                int id = rs.getInt("id");
-                user.setId(id);
-                String firstName = rs.getString("firstname");
-                user.setFirstName(firstName);
-                String lastName = rs.getString("lastname");
-                user.setLastName(lastName);
-                String email = rs.getString("email");
-                user.setEmail(email);
-                String pass = rs.getString("pass");
-                user.setPass(pass);
-                byte role = rs.getByte("role");
-                user.setRole(role);
-                //Token
 
-                //Display values
-                System.out.print("ID: " + id);
-                System.out.print(", First name: " + firstName);
-                System.out.print(", Last name: " + lastName);
-                System.out.print(", Email: " + email);
-                System.out.print(", Pass: " + pass);
-                System.out.print(", Role: " + role);
-                System.out.println();
-            }
+        if (user.getId() != -1) {
+            // Todo: generalize token and save to database add to user""
+             String createJWT = JWTToken.createJWT(user.getLastName() + user.getFirstName(),user.getPass(),user.getEmail(),10000);
+             System.out.println(createJWT);
+             Claims claims =  JWTToken.decodeJWT(createJWT);
+             return claims;
 
-            if (user.getId()!=-1) {
-                // Todo: generalize token and save to database add to user""
-                // Create util package (class DBUtil get(sql query), create(sql query), update(sql query), delete(sql query))
-                return user.toString();
-            }
-            rs.close();
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (stmt != null)
-                    conn.close();
-            } catch (SQLException se) {
-            }// do nothing
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }//end finally try
-        }//end try
-        System.out.println("Goodbye!");
-        return "";
+            // Create util package (class DBUtil get(sql query), create(sql query), update(sql query), delete(sql query))
+            //return user.toString();
+        }
+        rs.close();
+
+        return null;
     }
 
     @PostMapping("/logout")

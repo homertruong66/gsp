@@ -9,7 +9,7 @@ public class JDBC {
 
     //  Database credentials
     static final String USER = "root";
-    static final String PASS = "1234";
+    static final String PASS = "123456";
 
     public static void main(String[] args) {
         Connection conn = null;
