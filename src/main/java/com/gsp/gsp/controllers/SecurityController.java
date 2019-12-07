@@ -12,7 +12,9 @@ public class SecurityController {
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password) {
 
-        DBUtil.get("SELECT id, firstname, lastname, email, pass, role FROM users WHERE email = '"+ username +"' AND pass = '"+ password+"'");
+        User user = DBUtil.getUser("SELECT id, firstname, lastname, email, pass, role FROM users WHERE email = '"+ username +"' AND pass = '"+ password+"'");
+//        todo convert to JSON and return: GSON
+        return "";
     }
 
     @PostMapping("/logout")

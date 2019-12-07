@@ -13,7 +13,9 @@ public class DBUtil {
     static final String USER = "root";
     static final String PASS = "1234";
 
-    public static String get(String sql){
+    public static User getUser(String sql){
+
+        //        todo User object assign return User
 
         Connection conn = null;
         Statement stmt = null;
