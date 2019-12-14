@@ -1,35 +1,30 @@
 package com.gsp.gsp.util;
 
-import com.gsp.gsp.models.User;
+import com.gsp.gsp.model.User;
 
 import java.sql.*;
+import java.util.UUID;
 
 public class DBUtil {
 
-    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost/gspdb";
+    private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    private static final String DB_URL = "jdbc:mysql://localhost/gsp";
 
     //  Database credentials
-    static final String USER = "root";
-    static final String PASS = "1234";
+    private static final String USER = "root";
+    private static final String PASS = "admin";
 
     public static User getUser(String sql){
-
-        //        todo User object assign return User
-
         Connection conn = null;
         Statement stmt = null;
         try {
             //STEP 2: Register JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(JDBC_DRIVER);
 
             //STEP 3: Open a connection
-            System.out.println("Connecting to a selected database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            System.out.println("Connected database successfully...");
 
             //STEP 4: Execute a query
-            System.out.println("Creating statement...");
             stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(sql);
@@ -37,43 +32,41 @@ public class DBUtil {
             User user = new User();
             while (rs.next()) {
                 //Retrieve by column name
-                int id = rs.getInt("id");
+                String id = rs.getString("id");
                 user.setId(id);
-                String firstName = rs.getString("firstname");
+                String firstName = rs.getString("first_name");
                 user.setFirstName(firstName);
-                String lastName = rs.getString("lastname");
+                String lastName = rs.getString("last_name");
                 user.setLastName(lastName);
                 String email = rs.getString("email");
                 user.setEmail(email);
-                String pass = rs.getString("pass");
+                String pass = rs.getString("password");
                 user.setPass(pass);
-                byte role = rs.getByte("role");
+                String role = rs.getString("role");
                 user.setRole(role);
-                //Token
-
-                //Display values
-                System.out.print("ID: " + id);
-                System.out.print(", First name: " + firstName);
-                System.out.print(", Last name: " + lastName);
-                System.out.print(", Email: " + email);
-                System.out.print(", Pass: " + pass);
-                System.out.print(", Role: " + role);
-                System.out.println();
+                String token = rs.getString("token");
+                user.setToken(token);
             }
 
-            if (user.getId()!=-1) {
-                // Todo: generalize token and save to database, add to user field
-                // Create util package (class DBUtil get(sql query), create(sql query), update(sql query), delete(sql query))
-                return user.toString();
+            if (user.getId() != null) {
+                String token = UUID.randomUUID().toString();
+                String updateTokenSql = "UPDATE users u " +
+                                        "SET u.token = '" + token + "' " +
+                                        "WHERE u.id = '" + user.getId() + "'";
+                updateToken(updateTokenSql);
+                return user;
             }
             rs.close();
-        } catch (SQLException se) {
+        }
+        catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             //Handle errors for Class.forName
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             //finally block used to close resources
             try {
                 if (stmt != null)
@@ -87,7 +80,46 @@ public class DBUtil {
                 se.printStackTrace();
             }//end finally try
         }//end try
-        System.out.println("Goodbye!");
-        return "";
+        
+        return null;
+    }
+    
+    public static void updateToken(String sql) {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            //STEP 2: Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+        
+            //STEP 3: Open a connection
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        
+            //STEP 4: Execute a query
+            stmt = conn.createStatement();
+        
+            stmt.executeUpdate(sql);
+        }
+        catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        }
+        catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        }
+        finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
     }
 }

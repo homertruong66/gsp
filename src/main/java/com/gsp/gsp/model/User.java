@@ -1,13 +1,13 @@
-package com.gsp.gsp.models;
+package com.gsp.gsp.model;
 
 public class User {
 
-    private int id;
+    private String id;
     private String firstName;
     private String lastName;
     private String email;
     private String pass;
-    private byte role;
+    private String role;
     private String token;
 
     public String getToken() {
@@ -17,15 +17,15 @@ public class User {
     public void setToken(String token) {
         this.token = token;
     }
-
-    public int getId() {
+    
+    public String getId() {
         return id;
     }
-
-    public void setId(int id) {
+    
+    public void setId(String id) {
         this.id = id;
     }
-
+    
     public String getFirstName() {
         return firstName;
     }
@@ -57,15 +57,15 @@ public class User {
     public void setPass(String pass) {
         this.pass = pass;
     }
-
-    public byte getRole() {
+    
+    public String getRole() {
         return role;
     }
-
-    public void setRole(byte role) {
+    
+    public void setRole(String role) {
         this.role = role;
     }
-
+    
     @Override
     public String toString() {
         return "User{" +
