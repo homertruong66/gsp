@@ -1,0 +1,8 @@
+# Web Server Properties
+web-server:
+  port: 9090
+  jetty:
+    queue-size: 1000
+    min-threads: 10
+    max-threads: 100
+    idle-timeout: 30000
