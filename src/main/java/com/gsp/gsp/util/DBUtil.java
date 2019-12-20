@@ -3,6 +3,8 @@ package com.gsp.gsp.util;
 import com.gsp.gsp.model.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class DBUtil {
@@ -10,116 +12,130 @@ public class DBUtil {
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DB_URL = "jdbc:mysql://localhost/gsp";
 
-    //  Database credentials
     private static final String USER = "root";
     private static final String PASS = "admin";
 
-    public static User getUser(String sql){
+    public static User getUserLogin(String sql) {
         Connection conn = null;
         Statement stmt = null;
         try {
-            //STEP 2: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            //STEP 3: Open a connection
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
-            //STEP 4: Execute a query
             stmt = conn.createStatement();
-
             ResultSet rs = stmt.executeQuery(sql);
-            //STEP 5: Extract data from result set
             User user = new User();
             while (rs.next()) {
-                //Retrieve by column name
-                String id = rs.getString("id");
-                user.setId(id);
-                String firstName = rs.getString("first_name");
-                user.setFirstName(firstName);
-                String lastName = rs.getString("last_name");
-                user.setLastName(lastName);
-                String email = rs.getString("email");
-                user.setEmail(email);
-                String pass = rs.getString("password");
-                user.setPass(pass);
-                String role = rs.getString("role");
-                user.setRole(role);
-                String token = rs.getString("token");
-                user.setToken(token);
+                user.setId(rs.getString("id"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPass(rs.getString("password"));
+                user.setRole(rs.getString("role"));
+                user.setToken(rs.getString("token"));
             }
-
             if (user.getId() != null) {
                 String token = UUID.randomUUID().toString();
                 String updateTokenSql = "UPDATE users u " +
-                                        "SET u.token = '" + token + "' " +
-                                        "WHERE u.id = '" + user.getId() + "'";
+                        "SET u.token = '" + token + "' " +
+                        "WHERE u.id = '" + user.getId() + "'";
                 updateToken(updateTokenSql);
                 return user;
             }
             rs.close();
-        }
-        catch (SQLException se) {
-            //Handle errors for JDBC
+        } catch (SQLException se) {
             se.printStackTrace();
-        }
-        catch (Exception e) {
-            //Handle errors for Class.forName
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            //finally block used to close resources
-            try {
-                if (stmt != null)
-                    conn.close();
-            } catch (SQLException se) {
-            }// do nothing
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }//end finally try
-        }//end try
-        
         return null;
     }
-    
+
     public static void updateToken(String sql) {
         Connection conn = null;
         Statement stmt = null;
         try {
-            //STEP 2: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-        
-            //STEP 3: Open a connection
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        
-            //STEP 4: Execute a query
             stmt = conn.createStatement();
-        
             stmt.executeUpdate(sql);
-        }
-        catch (SQLException se) {
-            //Handle errors for JDBC
+        } catch (SQLException se) {
             se.printStackTrace();
-        }
-        catch (Exception e) {
-            //Handle errors for Class.forName
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            //finally block used to close resources
-            try {
-                if (stmt != null)
-                    conn.close();
-            } catch (SQLException se) {
-            }// do nothing
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }//end finally try
-        }//end try
+
+    }
+
+    public static List<User> getUser(String sql) {
+        Connection conn = null;
+        Statement stmt = null;
+        List<User> listUser = new ArrayList<User>();
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                User user = new User(rs.getString("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role"),
+                        rs.getString("token")
+                );
+                listUser.add(user);
+            }
+            rs.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listUser;
+    }
+
+    public static User getUserByID(String id) {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = '" + id + "' ");
+            User user = new User();
+            while (rs.next()) {
+                user.setId(rs.getString("id"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPass(rs.getString("password"));
+                user.setRole(rs.getString("role"));
+                user.setToken(rs.getString("token"));
+            }
+            rs.close();
+            return user;
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void deleteUser(String id) {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            stmt.executeUpdate("DELETE FROM users WHERE id = '" + id + "' ");
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
