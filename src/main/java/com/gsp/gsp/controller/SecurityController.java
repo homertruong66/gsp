@@ -15,7 +15,7 @@ public class SecurityController {
                      "WHERE u.email = '" + username + "' " +
                      "AND u.password = '" + password + "'";
         
-        User user = DBUtil.getUser(sql);
+        User user = DBUtil.getUserLogin(sql);
         Gson gson = new Gson();
         String json = gson.toJson(user);
         return json;
