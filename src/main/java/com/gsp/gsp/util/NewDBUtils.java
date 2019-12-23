@@ -38,8 +38,8 @@ public class NewDBUtils {
                 user.setLastName(lastName);
                 String email = rs.getString("email");
                 user.setEmail(email);
-                String pass = rs.getString("password");
-                user.setPass(pass);
+                String password = rs.getString("password");
+                user.setPassword(password);
                 String role = rs.getString("role");
                 user.setRole(role);
                 String token = rs.getString("token");

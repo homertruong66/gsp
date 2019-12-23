@@ -6,7 +6,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private String pass;
+    private String password;
     private String role;
     private String token;
 
@@ -50,12 +50,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPass() {
-        return pass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setPassword(String password) {
+        this.password = password;
     }
     
     public String getRole() {
@@ -65,7 +65,7 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
-    
+
     @Override
     public String toString() {
         return "User{" +
@@ -73,7 +73,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", pass='" + pass + '\'' +
+                ", password='" + password + '\'' +
                 ", role=" + role +
                 ", token='" + token + '\'' +
                 '}';
