@@ -1,9 +1,13 @@
 package com.gsp.gsp.util;
 
+import com.gsp.gsp.model.University;
 import com.gsp.gsp.model.User;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +18,17 @@ public class DBUtil {
 
     private static final String USER = "root";
     private static final String PASS = "admin";
+
+    protected Connection connection;
+
+    protected void doConnect() throws SQLException, ClassNotFoundException {
+        Class.forName(JDBC_DRIVER);
+        connection = DriverManager.getConnection(DB_URL, USER, PASS);
+    }
+
+    protected void doClose() throws SQLException {
+        connection.close();
+    }
 
     public static User getUserLogin(String sql) {
         Connection conn = null;
@@ -138,4 +153,77 @@ public class DBUtil {
             e.printStackTrace();
         }
     }
+
+    public static List<University> getUni(String sql) {
+        Connection conn = null;
+        Statement stmt = null;
+        List<University> listUni = new ArrayList<University>();
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                University uni = new University(
+                        rs.getString("idUni"),
+                        rs.getString("nameUni"),
+                        rs.getString("abbrNameUni"),
+                        rs.getString("addressUni"),
+                        rs.getString("typeUni")
+                );
+                listUni.add(uni);
+            }
+            rs.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listUni;
+    }
+
+    public static University getUniById(String id) {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM university WHERE id = '" + id + "' ");
+            University uni = new University();
+            while (rs.next()) {
+                uni.setIdUni(rs.getString("id"));
+                uni.setNameUni(rs.getString("nameUni"));
+                uni.setAbbrNameUni(rs.getString("abbrNameUni"));
+                uni.setAddressUni(rs.getString("addressUni"));
+                uni.setTypeUni(rs.getString("typeUni"));
+            }
+            rs.close();
+            return uni;
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void updateUni(String sql){
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }
+
