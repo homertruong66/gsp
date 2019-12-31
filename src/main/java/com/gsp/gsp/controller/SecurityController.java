@@ -7,6 +7,7 @@ import com.gsp.gsp.model.UserInfo;
 import org.springframework.web.bind.annotation.*;
 import com.gsp.gsp.util.NewDBUtils;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class SecurityController {
 

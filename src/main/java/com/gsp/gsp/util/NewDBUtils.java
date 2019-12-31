@@ -48,8 +48,8 @@ public class NewDBUtils {
             if (user.getId() != null) {
                 String token = UUID.randomUUID().toString();
                 String updateTokenSql = "UPDATE users u " +
-                        "SET u.token = '" + token + "' " +
-                        "WHERE u.id = '" + user.getId() + "'";
+                                        "SET u.token = '" + token + "' " +
+                                        "WHERE u.id = '" + user.getId() + "'";
                 updateToken(updateTokenSql);
                 return user;
             }
